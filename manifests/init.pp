@@ -486,7 +486,7 @@ class vsftpd (
   $hide_ids                = params_lookup( 'hide_ids' , 'global' ),
   $nopriv_user             = params_lookup( 'nopriv_user' , 'global' ),
   $secure_chroot_dir       = params_lookup( 'secure_chroot_dir' , 'global' ),
-  $log_ftp_protocol        = params_lookup( 'log_ftp_protocol' , 'global' ),
+  $log_ftp_protocol        = params_lookup( 'log_ftp_protocol' , 'global' )
 
   ) inherits vsftpd::params {
 
@@ -671,6 +671,7 @@ class vsftpd (
 
   if $vsftpd::bool_absent == true
   or $vsftpd::bool_disable == true
+  or $vsftpd::bool_monitor == false
   or $vsftpd::bool_disableboot == true {
     $manage_monitor = false
   } else {
@@ -807,7 +808,7 @@ class vsftpd (
 
 
   ### Service monitoring, if enabled ( monitor => true )
-  if $vsftpd::bool_monitor == true {
+  if $vsftpd::monitor_tool {
     monitor::port { "vsftpd_${vsftpd::protocol}_${vsftpd::port}":
       protocol => $vsftpd::protocol,
       port     => $vsftpd::port,
