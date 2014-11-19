@@ -197,6 +197,11 @@
 # instead of an IPv4 one. This parameter and the listen parameter are
 # mutually exclusive.
 #
+# [*listen_address*]
+#   If vsftpd is in standalone mode, the default listen address (of all
+#   local interfaces) may be overridden by this setting.
+#   Provide a numeric IP address.
+#
 # [*port*]
 #   The listening port, if any, of the service.
 #   This is used by monitor, firewall and puppi (optional) components
@@ -239,6 +244,18 @@
 #   Requires *chroot_list_enable* enabled.
 #   If the  option *chroot_local_user* is enabled, then the list file becomes a
 #   list of users to NOT place in a chroot() jail.
+#
+# [*chown_uploads*]
+#   If enabled, all anonymously uploaded files will have the ownership
+#   changed to the user specified in the setting chown_username. This is
+#   useful from an administrative, and perhaps security, standpoint.
+#   Default to NO.
+#
+# [*chown_username*]
+#   This is the name of the user who is given ownership of anonymously
+#   uploaded files. This option is only relevant if another option,
+#   chown_uploads, is set.
+#   Default: root
 #
 # [*connect_from_port_20*]
 #   Make sure PORT transfer connections originate from port 20 (ftp-data).
@@ -519,6 +536,7 @@ class vsftpd (
   $data_dir                = params_lookup( 'data_dir' ),
   $listen                  = params_lookup( 'listen' ),
   $listen_ipv6             = params_lookup( 'listen_ipv6' ),
+  $listen_address          = params_lookup( 'listen_address' ),
   $log_dir                 = params_lookup( 'log_dir' ),
   $log_file                = params_lookup( 'log_file' ),
   $port                    = params_lookup( 'port' ),
@@ -531,6 +549,8 @@ class vsftpd (
   $chroot_list_file        = params_lookup( 'chroot_list_file' ),
   $chroot_list_file_source = params_lookup( 'chroot_list_file_source' ),
   $chroot_local_user       = params_lookup( 'chroot_local_user' ),
+  $chown_uploads           = params_lookup( 'chown_uploads' ),
+  $chown_username          = params_lookup( 'chown_username' ),
   $connect_from_port_20    = params_lookup( 'connect_from_port_20' ),
   $data_connection_timeout = params_lookup( 'data_connection_timeout' ),
   $deny_email_enable       = params_lookup( 'deny_email_enable' ),
@@ -596,6 +616,7 @@ class vsftpd (
   $bool_anon_upload_enable=any2bool($anon_upload_enable)
   $bool_chroot_list_enable=any2bool($chroot_list_enable)
   $bool_chroot_local_user=any2bool($chroot_local_user)
+  $bool_chown_uploads=any2bool($chown_uploads)
   $bool_connect_from_port_20=any2bool($connect_from_port_20)
   $bool_deny_email_enable=any2bool($deny_email_enable)
   $bool_dirmessage_enable=any2bool($dirmessage_enable)
@@ -653,6 +674,11 @@ class vsftpd (
   }
 
   $real_chroot_local_user = $vsftpd::bool_chroot_local_user ? {
+    true  => 'YES',
+    false => 'NO',
+  }
+
+  $real_chown_uploads = $vsftpd::bool_chown_uploads ? {
     true  => 'YES',
     false => 'NO',
   }

@@ -28,6 +28,10 @@ listen_ipv6=<%= scope.lookupvar('vsftpd::real_listen_ipv6') %>
 <% else -%>
 # listen_ipv6=NO
 <% end-%>
+<% if scope.lookupvar('vsftpd::listen_address') != '' -%>
+# Listen only on following IP address
+listen_address=<%= scope.lookupvar('vsftpd::listen_address') %>
+<% end-%>
 #
 ftpd_banner=<%= scope.lookupvar('vsftpd::ftpd_banner') %>
 write_enable=<%= scope.lookupvar('vsftpd::real_write_enable') %>
@@ -75,8 +79,13 @@ chroot_list_file=<%= scope.lookupvar('vsftpd::chroot_list_file') -%>
 # If you want, you can arrange for uploaded anonymous files to be owned by
 # a different user. Note! Using "root" for uploaded files is not
 # recommended!
+<% if scope.lookupvar('vsftpd::bool_chown_uploads') -%>
+chown_uploads=<%= scope.lookupvar('vsftpd::real_chown_uploads') %>
+chown_username=<%= scope.lookupvar('vsftpd::chown_username') %>
+<% else -%>
 #chown_uploads=YES
 #chown_username=whoever
+<% end -%>
 #
 # It is recommended that you define on your system a unique user which the
 # ftp server can use as a totally isolated and unprivileged user.
